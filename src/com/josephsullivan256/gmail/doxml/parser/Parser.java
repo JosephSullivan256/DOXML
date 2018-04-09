@@ -87,7 +87,7 @@ public class Parser {
 			if(key.accepted){
 				expect(TokenType.separator,"=");
 				String value = expect(TokenType.literal);
-				element.addAttribute(key.token, value.substring(0,value.length()-1));
+				element.addAttribute(key.token, value.substring(1,value.length()-1));
 			} else {
 				attributesPresent = false;
 			}

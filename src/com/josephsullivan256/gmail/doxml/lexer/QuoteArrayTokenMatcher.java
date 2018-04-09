@@ -1,6 +1,7 @@
 package com.josephsullivan256.gmail.doxml.lexer;
 
 import com.josephsullivan256.gmail.doxml.Token;
+import com.josephsullivan256.gmail.doxml.util.Pair;
 
 public class QuoteArrayTokenMatcher implements TokenMatcher{
 	
@@ -14,10 +15,16 @@ public class QuoteArrayTokenMatcher implements TokenMatcher{
 	}
 
 	@Override
-	public boolean matches(String str, Token previous) {
+	public Pair<Integer,String> match(String str, Token previous) {
+		
+		Pair<Integer,String> longest = matchers[0].match(str, previous);
+		
 		for(QuoteTokenMatcher m: matchers){
-			if(m.matches(str,previous)) return true;
+			Pair<Integer,String> match = m.match(str, previous);
+			if(match.a > longest.a) longest = match;
 		}
-		return false;
+		
+		if(longest.a <= 0) return Pair.init(0, "");
+		return longest;
 	}
 }

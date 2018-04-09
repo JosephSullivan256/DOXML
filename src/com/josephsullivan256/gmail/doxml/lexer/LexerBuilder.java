@@ -32,47 +32,34 @@ public class LexerBuilder {
 		public List<Token> lex(String input) {
 			List<Token> tokens = new ArrayList<Token>();
 			
-			int xi = 0;
-			int xf = 1;
-			int len = input.length();
+			Token previous = null;
+			int index = 0;
 			
-			TokenType previousType = null;
-			
-			while(xf <= len) {
-				Pair<Boolean,TokenType> temp = match(input.substring(xi,xf),tokens);
-				if(!temp.a) {
-					if(previousType!=null) {
-						tokens.add(new Token(previousType,input.substring(xi,xf-1)));
-						xi = xf-1;
-						//xf++;
-					} else {
-						xi = xf;
-						xf++;
-					}
-					previousType = null;
-				} else {
-					previousType = temp.b;
-					xf++;
+			while(index < input.length()){
+				Pair<TokenType,Pair<Integer,String>> match = match(input.substring(index),previous);
+				if(match.b.a == 0) index++;
+				else {
+					Token current = new Token(match.a,match.b.b);
+					tokens.add(current);
+					previous = current;
+					index+=match.b.a;
 				}
-			}
-			String substr = input.substring(xi,xf-1);
-			Pair<Boolean,TokenType> finalTemp = match(substr,tokens);
-			if(finalTemp.a) {
-				tokens.add(new Token(finalTemp.b,substr));
 			}
 			
 			return tokens;
 		}
 		
-		private Pair<Boolean,TokenType> match(String str,List<Token> tokens) {
+		private Pair<TokenType,Pair<Integer,String>> match(String str,Token previous) {
+			
+			Pair<TokenType,TokenMatcher> firstEntry = tokenTypes.get(0);
+			Pair<TokenType,Pair<Integer,String>> longest = Pair.init(firstEntry.a,firstEntry.b.match(str, previous));
+			
 			for(Pair<TokenType,TokenMatcher> entry : tokenTypes) {
-				Token previous = null;
-				if(tokens.size()-1 >= 0) previous = tokens.get(tokens.size()-1);
-				if(entry.b.matches(str,previous)) {
-					return new Pair<Boolean,TokenType>(true,entry.a);
-				}
+				Pair<TokenType,Pair<Integer,String>> temp = Pair.init(entry.a,entry.b.match(str, previous));
+				if(temp.b.a > longest.b.a) longest = temp;
 			}
-			return new Pair<Boolean,TokenType>(false,null);
+			
+			return longest;
 		}
 		
 	}

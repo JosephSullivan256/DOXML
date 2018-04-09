@@ -77,11 +77,11 @@ public class Element {
 	}
 	
 	public List<Element> getChildren(String name){
-		return getChildren((e)->e.getName()==name);
+		return getChildren((e)->e.getName().equals(name));
 	}
 	
 	public Element getChild(String name){
-		return getChild((e)->e.getName()==name);
+		return getChild((e)->e.getName().equals(name));
 	}
 	
 	public List<Element> getChildren(){
